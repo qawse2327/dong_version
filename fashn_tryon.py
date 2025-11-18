@@ -3,7 +3,7 @@ import requests
 import time
 import os
 
-API_KEY = "***REDACTED***Z97u2dz0-Mtw8hvvXGUX66NAqPWgGjxRn"
+API_KEY = "fa-0obhFH8IfffG-BaOoDmNMuQ3DwW35oIbDjUNg"
 BASE_URL = "https://api.fashn.ai/v1"
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",

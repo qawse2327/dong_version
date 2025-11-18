@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, jsonify, send_file
-import os, base64
+from flask import Flask, render_template, request, jsonify, redirect
+import os, base64, time
+from fashn_tryon import run_tryon   # ← 새 API 키 넣은 너의 fashn_tryon.py 사용
 
-# [수정됨] templates 폴더를 명시적으로 지정
 app = Flask(__name__, template_folder="templates")
 
-# -------------------- 기존 설정 --------------------
+# -----------------------------
+# 폴더 경로 기본 설정
+# -----------------------------
 TOP_DIR = "static/tops"
 BOTTOM_DIR = "static/bottoms"
 OUTFIT_DIR = "static/outfits"
@@ -12,121 +14,144 @@ USER_IMG = "static/user.jpg"
 RESULT_DIR = "static/results"
 os.makedirs(RESULT_DIR, exist_ok=True)
 
-from fashn_tryon import run_tryon
-# ---------------------------------------------------
-# (TTS 관련 API 키, client, /tts 라우트 전부 삭제)
-# ('뷔페' 방식은 서버에 TTS 기능이 필요 없습니다)
-# ---------------------------------------------------
 
+# -----------------------------
+# 1) welcome (처음 화면)
+# -----------------------------
 @app.route("/")
 def welcome():
-    """ 
-    [수정됨] 여기가 새로운 첫 페이지(흰 화면)입니다.
-    """
     return render_template("welcome.html")
 
+
+# -----------------------------
+# 2) index
+# -----------------------------
 @app.route("/start")
-def index():
-    """ 
-    [수정됨] 기존 index.html은 이제 /start 주소입니다.
-    """
+def start_page():
     return render_template("index.html")
 
+
+# -----------------------------
+# 3) capture (사진 촬영)
+# -----------------------------
 @app.route("/capture")
 def capture_page():
     return render_template("capture.html")
 
+
+# -----------------------------
+# 4) review (촬영 결과 확인)
+# -----------------------------
 @app.route("/review")
 def review_page():
-    """ [추가됨] 누락된 /review 라우트 """
     return render_template("review.html")
 
-@app.route("/select")
-def select_page():
-    tops = [f"{TOP_DIR}/{f}" for f in os.listdir(TOP_DIR)]
-    bottoms = [f"{BOTTOM_DIR}/{f}" for f in os.listdir(BOTTOM_DIR)]
-    return render_template("select.html", tops=tops, bottoms=bottoms)
 
+# -----------------------------
+# 5) 사진 업로드 (capture → Flask)
+# -----------------------------
 @app.route("/upload", methods=["POST"])
-def upload():
+def upload_image():
     data = request.get_json()
     img_data = data.get("image")
+
     header, encoded = img_data.split(",", 1)
     decoded = base64.b64decode(encoded)
+
     with open(USER_IMG, "wb") as f:
         f.write(decoded)
+
     return jsonify({"success": True})
 
+
+# -----------------------------
+# 6) select (옷 선택 화면)
+# -----------------------------
+@app.route("/select")
+def select_page():
+    tops = [f"/static/tops/{f}" for f in os.listdir(TOP_DIR)]
+    bottoms = [f"/static/bottoms/{f}" for f in os.listdir(BOTTOM_DIR)]
+    return render_template("select.html", tops=tops, bottoms=bottoms)
+
+
+# -----------------------------
+# 7) loading 화면
+# -----------------------------
+@app.route("/loading")
+def loading_page():
+    return render_template("loading.html")
+
+
+# -----------------------------
+# 8) TRY-ON (합성 API 실행)
+# -----------------------------
 @app.route("/tryon", methods=["POST"])
 def tryon():
     data = request.get_json()
-    top = data.get("top")
-    bottom = data.get("bottom")
-    mode = data.get("mode")
-    
-    import time
-    timestamp = int(time.time())
-    
-    result_filename = ""
-    garment_to_try = ""
-    
-    def format_path(path_str):
-        if not path_str:
+
+    top_url = data.get("top")
+    bottom_url = data.get("bottom")
+    mode = data.get("mode")  # top / bottom / both
+
+    # URL("/static/...") → 파일 경로("static/...")
+    def to_file_path(url):
+        if not url:
             return None
-        if "/static/" in path_str:
-            path_str = path_str.split("/static/", 1)[1]
-        return os.path.join("static", path_str)
+        return url.replace("/static/", "static/")
 
-    top_path = format_path(top)
-    bottom_path = format_path(bottom)
+    top_path = to_file_path(top_url)
+    bottom_path = to_file_path(bottom_url)
 
+    timestamp = int(time.time())
+
+    # 어떤 옷을 합성할지 결정
     if mode == "top" and top_path:
         result_filename = f"result_top_{timestamp}.jpg"
-        garment_to_try = top_path
+        garment_path = top_path
+
     elif mode == "bottom" and bottom_path:
         result_filename = f"result_bottom_{timestamp}.jpg"
-        garment_to_try = bottom_path
+        garment_path = bottom_path
+
     elif mode == "both" and top_path and bottom_path:
-        try:
-            top_file = os.path.basename(top_path)
-            bottom_file = os.path.basename(bottom_path)
-            top_num = top_file.replace("top", "").split(".")[0]
-            bottom_num = bottom_file.replace("bottom", "").split(".")[0]
-            outfit_name = f"set_{top_num}_{bottom_num}.png"
-            outfit_path = os.path.join(OUTFIT_DIR, outfit_name)
-            
-            if not os.path.exists(outfit_path):
-                return jsonify({"error": f"해당 조합의 'set' 파일이 없습니다: {outfit_path}"}), 400
-                
-            result_filename = f"result_set_{top_num}_{bottom_num}_{timestamp}.jpg"
-            garment_to_try = outfit_path
-        except Exception as e:
-            print(f" आउटफिट 경로 생성 오류: {e}")
-            return jsonify({"error": "파일 이름 규칙 오류"}), 400
+        # set 파일 찾기
+        top_name = os.path.basename(top_path).replace("top", "").split(".")[0]
+        bottom_name = os.path.basename(bottom_path).replace("bottom", "").split(".")[0]
+        outfit_name = f"set_{top_name}_{bottom_name}.png"
+        garment_path = os.path.join(OUTFIT_DIR, outfit_name)
 
-    if not garment_to_try:
-        return jsonify({"error": "합성할 옷 정보가 없습니다."}), 400
+        if not os.path.exists(garment_path):
+            return jsonify({"error": f"세트 파일 없음: {garment_path}"}), 400
 
-    result_path = run_tryon(USER_IMG, garment_to_try, result_filename)
-    if result_path:
-        url_path = result_path.replace(os.sep, "/")
-        if not url_path.startswith("/"):
-             url_path = "/" + url_path
-        return jsonify({"result": url_path})
-        
-    return jsonify({"error": "합성 실패"}), 400
+        result_filename = f"result_set_{top_name}_{bottom_name}_{timestamp}.jpg"
 
-@app.route("/loading")
-def loading_page():
-    """ [추가됨] 누락된 /loading 라우트 """
-    return render_template("loading.html")
+    else:
+        return jsonify({"error": "옷 선택 오류"}), 400
 
+    # ------ Fashn API 호출 ------
+    result_path = run_tryon(USER_IMG, garment_path, result_filename)
+
+    if not result_path:
+        return jsonify({"error": "합성 실패"}), 400
+
+    # URL 변환 (브라우저용)
+    result_url = "/" + result_path.replace("\\", "/")
+    return jsonify({"result": result_url})
+
+
+# -----------------------------
+# 9) result 화면
+# -----------------------------
 @app.route("/result")
 def result_page():
     image_path = request.args.get("image")
     if not image_path:
-        return "결과 이미지가 없습니다.", 404
+        return "이미지가 없습니다.", 404
     return render_template("result.html", result_image=image_path)
 
+
+# -----------------------------
+# Flask 실행
+# -----------------------------
 if __name__ == "__main__":
     app.run(debug=True)
