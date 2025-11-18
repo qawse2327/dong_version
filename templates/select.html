@@ -10,19 +10,26 @@
 body{margin:0;padding:0;width:100vw;height:100vh;display:flex;flex-direction:column;background:#000;overflow:hidden;font-family:"Noto Sans",sans-serif;color:white;}
 .tryon-btn{position:absolute;top:70%;transform:translateY(-110%);right:14px;padding:10px 26px;font-size:18px;font-weight:700;border-radius:40px;border:1px solid rgba(255,255,255,0.45);background:rgba(255,255,255,0.10);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:white;cursor:pointer;box-shadow:0 0 18px rgba(255,255,255,0.45),0 0 32px rgba(255,255,255,0.22),inset 0 0 8px rgba(255,255,255,0.25);transition:transform .18s ease, box-shadow .25s ease;}
 .tryon-btn:active{transform:translateY(-110%) scale(.95);box-shadow:0 0 24px rgba(255,255,255,0.65),0 0 44px rgba(255,255,255,0.32),inset 0 0 12px rgba(255,255,255,0.32);}
+
 .top-photo-area{height:70%;background:#000;background-size:cover;background-position:center;background-repeat:no-repeat;display:flex;justify-content:center;align-items:center;border-bottom:1px solid rgba(255,255,255,0.10);box-shadow:0 0 35px rgba(255,255,255,0.35),0 0 70px rgba(255,255,255,0.18),0 0 120px rgba(255,255,255,0.12);}
+
 .clothes-row{height:15%;background:rgba(255,255,255,0.03);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,0.45);border-bottom:1px solid rgba(255,255,255,0.30);box-shadow:0 -2px 10px rgba(255,255,255,0.20),0 -4px 18px rgba(255,255,255,0.12),inset 0 1px 6px rgba(255,255,255,0.15);display:flex;align-items:center;padding:0 12px;}
+
 .row-title{width:70px;min-width:70px;font-size:18px;font-weight:700;color:rgba(255,255,255,0.88);text-shadow:0 0 6px rgba(255,255,255,0.35);}
+
 .horizontal-scroll{flex:1;display:flex;justify-content:center;flex-wrap:nowrap;align-items:center;overflow-x:auto;overflow-y:hidden;padding:10px 10px;scroll-behavior: smooth;mask-image: linear-gradient(to right,transparent 0%,black 12%,black 88%,transparent 100%);}
 .horizontal-scroll::-webkit-scrollbar{ height:6px }
 .horizontal-scroll::-webkit-scrollbar-track{background:rgba(255,255,255,0.08);border-radius:10px;}
 .horizontal-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.35);border-radius:10px;}
+
 .clothes-img{height:95%;max-height:150px;margin-right:20px;cursor:pointer;border-radius:12px;background:rgba(255,255,255,0.05);padding:4px;transition: transform .25s var(--ease), box-shadow .25s var(--ease),opacity .25s var(--ease);box-shadow:0 0 8px rgba(255,255,255,0.25),inset 0 0 10px rgba(255,255,255,0.15);}
 .clothes-img:hover{transform:scale(1.08);box-shadow:0 0 16px rgba(255,255,255,0.45),inset 0 0 16px rgba(255,255,255,0.25);}
 .clothes-img.selected{transform:scale(1.12);box-shadow:0 0 20px rgba(74,127,255,0.75),0 0 30px rgba(74,127,255,0.45),inset 0 0 16px rgba(74,127,255,0.30);outline:2px solid rgba(74,127,255,0.45);}
 .clothes-img.deal-from-center{position:relative;opacity:0;z-index:10;transition:transform 800ms var(--ease), opacity 400ms linear;}
 .clothes-img.dealt{transform:translate(0,0) rotate(0deg) scale(1);opacity:1;z-index:1;}
-@keyframes pop {0% { transform:scale(1); } 50% { transform:scale(1.12); } 100% { transform:scale(1.08); }}
+
+@keyframes pop {0% { transform:scale(1);} 50% { transform:scale(1.12);} 100% { transform:scale(1.08);} }
+
 .modal-overlay{position:fixed; inset:0;background:rgba(0,0,0,0.6);display:flex; justify-content:center; align-items:center;z-index:3000;backdrop-filter:blur(4px);}
 .modal-box{background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.35);border-radius:16px;padding:22px;width:85%; max-width:380px;box-shadow:0 0 18px rgba(255,255,255,0.25),inset 0 0 10px rgba(255,255,255,0.25);animation:fadeIn .25s ease-out;}
 .modal-img{width:100%; max-width:270px;border-radius:12px;margin-bottom:22px;box-shadow:0 0 12px rgba(255,255,255,0.32);}
@@ -30,7 +37,8 @@ body{margin:0;padding:0;width:100vw;height:100vh;display:flex;flex-direction:col
 .modal-btn{flex:1;border:none;border-radius:12px;padding:12px 0;font-size:17px;font-weight:700;cursor:pointer;}
 .cancel-btn{background:rgba(255,255,255,0.18);color:white;}
 .select-btn{background:#4a7fff;color:white;}
-@keyframes fadeIn{from { opacity:0; transform:scale(.92); } to { opacity:1; transform:scale(1); }}
+
+@keyframes fadeIn{from { opacity:0; transform:scale(.92);} to { opacity:1; transform:scale(1);} }
 </style>
 </head>
 
@@ -44,7 +52,7 @@ body{margin:0;padding:0;width:100vw;height:100vh;display:flex;flex-direction:col
     <div class="row-title">상의</div>
     <div class="horizontal-scroll" id="tops-row">
         {% for top_img in tops %}
-        <img src="{{ url_for('static', filename=top_img.split('static/')[-1]) }}" class="clothes-img" data-type="top" data-name="{{ loop.index }}">
+        <img src="/static/{{ top_img.split('static/')[-1] }}" class="clothes-img" data-type="top" data-name="{{ loop.index }}">
         {% endfor %}
     </div>
 </div>
@@ -53,7 +61,7 @@ body{margin:0;padding:0;width:100vw;height:100vh;display:flex;flex-direction:col
     <div class="row-title">하의</div>
     <div class="horizontal-scroll" id="bottoms-row">
         {% for bottom_img in bottoms %}
-        <img src="{{ url_for('static', filename=bottom_img.split('static/')[-1]) }}" class="clothes-img" data-type="bottom" data-name="{{ loop.index }}">
+        <img src="/static/{{ bottom_img.split('static/')[-1] }}" class="clothes-img" data-type="bottom" data-name="{{ loop.index }}">
         {% endfor %}
     </div>
 </div>
@@ -63,8 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const savedImage = localStorage.getItem("capturedImage");
 
     if (savedImage) {
-        document.querySelector(".top-photo-area").style.backgroundImage =
-            `url('${savedImage}')`;
+        document.querySelector(".top-photo-area").style.backgroundImage = `url('${savedImage}')`;
     } else {
         alert("사진이 없습니다. 다시 촬영해주세요.");
         window.location.href = "/capture";
@@ -130,12 +137,11 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(runDeal);
     }
 
-    // 모달 상태를 관리할 변수
+    // ★ 미리보기 클릭 → 옷 선택 모달
     let isModalOpen = false;
     let currentModal = null;
 
     function openModal(img, type, name){
-        // 이미 모달이 열려있으면 닫기
         if (isModalOpen && currentModal) {
             currentModal.remove();
             isModalOpen = false;
@@ -143,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay';
-        currentModal = overlay; // 현재 모달로 저장
+        currentModal = overlay;
         isModalOpen = true;
 
         overlay.innerHTML = `
@@ -167,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.querySelector('.select-btn').onclick = () => {
             imgs.filter(x=> x.dataset.type === type)
                 .forEach(el=> el.classList.remove('selected'));
-            img.classList.add('selected'); // 원본 이미지에 'selected' 클래스 추가
+            img.classList.add('selected');
             
             overlay.remove();
             isModalOpen = false;
@@ -179,8 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         img.addEventListener('click', ()=>{
             img.style.animation = 'pop .32s var(--ease) forwards';
             setTimeout(()=> img.style.animation='', 350);
-            
-            // 모달 열기
+
             openModal(img, img.dataset.type, img.dataset.name);
         });
     });
@@ -200,9 +205,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // 선택된 옷 정보 수집 (src 경로 사용)
-        const topSrc = selectedTop ? selectedTop.getAttribute('src') : null;
-        const bottomSrc = selectedBottom ? selectedBottom.getAttribute('src') : null;
+        // ★ 절대 URL → /static/... 로 변환
+        function clean(src) {
+            if (!src) return null;
+            const idx = src.indexOf("/static/");
+            return idx !== -1 ? src.substring(idx) : src;
+        }
+
+        const topSrc = clean(selectedTop?.getAttribute('src'));
+        const bottomSrc = clean(selectedBottom?.getAttribute('src'));
         
         let mode = "top";
         if (topSrc && bottomSrc) {
@@ -213,9 +224,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         tryonBtn.disabled = true;
         tryonBtn.textContent = "처리 중...";
-        
-        // 로딩 화면으로 이동 (src 경로를 URL 파라미터로 전달)
-        const loadingUrl = `/loading?top=${encodeURIComponent(topSrc || '')}&bottom=${encodeURIComponent(bottomSrc || '')}&mode=${mode}`;
+
+        const loadingUrl =
+          `/loading?top=${encodeURIComponent(topSrc || '')}&bottom=${encodeURIComponent(bottomSrc || '')}&mode=${mode}`;
+
         window.location.href = loadingUrl;
     });
 });
