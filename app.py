@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify, redirect
 import os, base64, time
-from fashn_tryon import run_tryon   # ← 새 API 키 넣은 너의 fashn_tryon.py 사용
+from fashn_tryon import run_tryon   # 너의 fashn_tryon.py 사용
 
 app = Flask(__name__, template_folder="templates")
 
@@ -48,7 +48,7 @@ def review_page():
 
 
 # -----------------------------
-# 5) 사진 업로드 (capture → Flask)
+# 5) 사진 업로드
 # -----------------------------
 @app.route("/upload", methods=["POST"])
 def upload_image():
@@ -83,7 +83,7 @@ def loading_page():
 
 
 # -----------------------------
-# 8) TRY-ON (합성 API 실행)
+# 8) TRY-ON (합성 실행) — ★ 완전방어 버전 ★
 # -----------------------------
 @app.route("/tryon", methods=["POST"])
 def tryon():
@@ -91,7 +91,6 @@ def tryon():
 
     top_url = data.get("top")
     bottom_url = data.get("bottom")
-    mode = data.get("mode")  # top / bottom / both
 
     # URL("/static/...") → 파일 경로("static/...")
     def to_file_path(url):
@@ -104,37 +103,56 @@ def tryon():
 
     timestamp = int(time.time())
 
-    # 어떤 옷을 합성할지 결정
-    if mode == "top" and top_path:
-        result_filename = f"result_top_{timestamp}.jpg"
+    # -----------------------------------------
+    # ★ 프론트에서 온 mode는 신뢰하지 않는다!!
+    #    → top_path/bottom_path로 진짜 mode 재계산
+    # -----------------------------------------
+    if top_path and bottom_path:
+        mode = "both"
+    elif top_path:
+        mode = "top"
+    elif bottom_path:
+        mode = "bottom"
+    else:
+        return jsonify({"error": "옷 선택 오류"}), 400
+
+    # -----------------------------------------
+    # 1) 상의만 선택
+    # -----------------------------------------
+    if mode == "top":
         garment_path = top_path
+        result_filename = f"result_top_{timestamp}.jpg"
 
-    elif mode == "bottom" and bottom_path:
-        result_filename = f"result_bottom_{timestamp}.jpg"
+    # -----------------------------------------
+    # 2) 하의만 선택
+    # -----------------------------------------
+    elif mode == "bottom":
         garment_path = bottom_path
+        result_filename = f"result_bottom_{timestamp}.jpg"
 
-    elif mode == "both" and top_path and bottom_path:
-        # set 파일 찾기
-        top_name = os.path.basename(top_path).replace("top", "").split(".")[0]
-        bottom_name = os.path.basename(bottom_path).replace("bottom", "").split(".")[0]
-        outfit_name = f"set_{top_name}_{bottom_name}.png"
+    # -----------------------------------------
+    # 3) 상의+하의 둘 다 선택 → set 파일 사용
+    # -----------------------------------------
+    else:  # mode == "both"
+        top_num = os.path.basename(top_path).replace("top", "").split(".")[0]
+        bottom_num = os.path.basename(bottom_path).replace("bottom", "").split(".")[0]
+        outfit_name = f"set_{top_num}_{bottom_num}.png"
         garment_path = os.path.join(OUTFIT_DIR, outfit_name)
 
         if not os.path.exists(garment_path):
             return jsonify({"error": f"세트 파일 없음: {garment_path}"}), 400
 
-        result_filename = f"result_set_{top_name}_{bottom_name}_{timestamp}.jpg"
+        result_filename = f"result_set_{top_num}_{bottom_num}_{timestamp}.jpg"
 
-    else:
-        return jsonify({"error": "옷 선택 오류"}), 400
-
-    # ------ Fashn API 호출 ------
+    # -----------------------------------------
+    # Fashn API 실행
+    # -----------------------------------------
     result_path = run_tryon(USER_IMG, garment_path, result_filename)
 
     if not result_path:
         return jsonify({"error": "합성 실패"}), 400
 
-    # URL 변환 (브라우저용)
+    # 브라우저용 경로 변환
     result_url = "/" + result_path.replace("\\", "/")
     return jsonify({"result": result_url})
 

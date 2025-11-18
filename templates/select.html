@@ -66,7 +66,11 @@ body{margin:0;padding:0;width:100vw;height:100vh;display:flex;flex-direction:col
     </div>
 </div>
 
+
 <script>
+/* 🔥 페이지 들어올 때마다 완전 초기화 */
+localStorage.removeItem("tryonData");
+
 document.addEventListener("DOMContentLoaded", () => {
     const savedImage = localStorage.getItem("capturedImage");
 
@@ -137,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(runDeal);
     }
 
-    // ★ 미리보기 클릭 → 옷 선택 모달
+    /* 모달 */
     let isModalOpen = false;
     let currentModal = null;
 
@@ -193,6 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     startDeal();
 });
 
+/* 🔥 TRY-ON 버튼 */
 document.addEventListener('DOMContentLoaded', () => {
     const tryonBtn = document.getElementById('tryonBtn');
     
@@ -204,8 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("상의 또는 하의를 선택해주세요.");
             return;
         }
-        
-        // ★ 절대 URL → /static/... 로 변환
+
         function clean(src) {
             if (!src) return null;
             const idx = src.indexOf("/static/");
@@ -214,16 +218,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const topSrc = clean(selectedTop?.getAttribute('src'));
         const bottomSrc = clean(selectedBottom?.getAttribute('src'));
-        
+
         let mode = "top";
-        if (topSrc && bottomSrc) {
-            mode = "both";
-        } else if (bottomSrc) {
-            mode = "bottom";
-        }
-        
+        if (topSrc && bottomSrc) mode = "both";
+        else if (bottomSrc) mode = "bottom";
+
         tryonBtn.disabled = true;
         tryonBtn.textContent = "처리 중...";
+
+        /* 🔥🔥 tryonData 저장 — loading.html이 찾는 핵심 */
+        const payload = { top: topSrc, bottom: bottomSrc, mode };
+        localStorage.setItem("tryonData", JSON.stringify(payload));
 
         const loadingUrl =
           `/loading?top=${encodeURIComponent(topSrc || '')}&bottom=${encodeURIComponent(bottomSrc || '')}&mode=${mode}`;
