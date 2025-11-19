@@ -1,0 +1,263 @@
+.page-select {
+
+:root {
+    --ease: cubic-bezier(.2,.9,.3,1);
+    --glass-bg: rgba(255,255,255,0.08);
+    --glass-border: rgba(255,255,255,0.25);
+    --glass-shadow:0 0 12px rgba(255,255,255,0.25),0 0 24px rgba(255,255,255,0.18),inset 0 0 6px rgba(255,255,255,0.25);
+}
+* { box-sizing: border-box; }
+body{
+    margin:0;padding:0;width:100vw;height:100vh;display:flex;flex-direction:column;background:#000;overflow:hidden;font-family:"Noto Sans",sans-serif;color:white;
+}
+.tryon-btn{
+    position:absolute;top:70%;transform:translateY(-110%);right:14px;padding:10px 26px;font-size:18px;font-weight:700;border-radius:40px;border:1px solid rgba(255,255,255,0.45);background:rgba(255,255,255,0.10);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:white;cursor:pointer;box-shadow:0 0 18px rgba(255,255,255,0.45),0 0 32px rgba(255,255,255,0.22),inset 0 0 8px rgba(255,255,255,0.25);transition:transform .18s ease, box-shadow .25s ease;
+}
+.tryon-btn:active{
+    transform:translateY(-110%) scale(.95);box-shadow:0 0 24px rgba(255,255,255,0.65),0 0 44px rgba(255,255,255,0.32),inset 0 0 12px rgba(255,255,255,0.32);
+}
+
+.top-photo-area{
+    height:70%;background:#000;background-size:cover;background-position:center;background-repeat:no-repeat;display:flex;justify-content:center;align-items:center;border-bottom:1px solid rgba(255,255,255,0.10);box-shadow:0 0 35px rgba(255,255,255,0.35),0 0 70px rgba(255,255,255,0.18),0 0 120px rgba(255,255,255,0.12);
+}
+
+.clothes-row{
+    height:15%;background:rgba(255,255,255,0.03);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,0.45);border-bottom:1px solid rgba(255,255,255,0.30);box-shadow:0 -2px 10px rgba(255,255,255,0.20),0 -4px 18px rgba(255,255,255,0.12),inset 0 1px 6px rgba(255,255,255,0.15);display:flex;align-items:center;padding:0 12px;
+}
+
+.row-title{
+    width:70px;min-width:70px;font-size:18px;font-weight:700;color:rgba(255,255,255,0.88);text-shadow:0 0 6px rgba(255,255,255,0.35);
+}
+
+.horizontal-scroll{
+    flex:1;display:flex;justify-content:center;flex-wrap:nowrap;align-items:center;overflow-x:auto;overflow-y:hidden;padding:10px 10px;scroll-behavior: smooth;mask-image: linear-gradient(to right,transparent 0%,black 12%,black 88%,transparent 100%);
+}
+.horizontal-scroll::-webkit-scrollbar{ height:6px }
+.horizontal-scroll::-webkit-scrollbar-track{background:rgba(255,255,255,0.08);border-radius:10px;}
+.horizontal-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.35);border-radius:10px;}
+
+.clothes-img{
+    height:95%;max-height:150px;margin-right:20px;cursor:pointer;border-radius:12px;background:rgba(255,255,255,0.05);padding:4px;transition: transform .25s var(--ease), box-shadow .25s var(--ease),opacity .25s var(--ease);box-shadow:0 0 8px rgba(255,255,255,0.25),inset 0 0 10px rgba(255,255,255,0.15);
+}
+.clothes-img:hover{transform:scale(1.08);box-shadow:0 0 16px rgba(255,255,255,0.45),inset 0 0 16px rgba(255,255,255,0.25);}
+.clothes-img.selected{transform:scale(1.12);box-shadow:0 0 20px rgba(74,127,255,0.75),0 0 30px rgba(74,127,255,0.45),inset 0 0 16px rgba(74,127,255,0.30);outline:2px solid rgba(74,127,255,0.45);}
+.clothes-img.deal-from-center{position:relative;opacity:0;z-index:10;transition:transform 800ms var(--ease), opacity 400ms linear;}
+.clothes-img.dealt{transform:translate(0,0) rotate(0deg) scale(1);opacity:1;z-index:1;}
+
+@keyframes pop {0% { transform:scale(1);} 50% { transform:scale(1.12);} 100% { transform:scale(1.08);} }
+
+.modal-overlay{
+    position:fixed; inset:0;background:rgba(0,0,0,0.6);display:flex; justify-content:center; align-items:center;z-index:3000;backdrop-filter:blur(4px);
+}
+.modal-box{
+    background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.35);border-radius:16px;padding:22px;width:85%; max-width:380px;box-shadow:0 0 18px rgba(255,255,255,0.25),inset 0 0 10px rgba(255,255,255,0.25);animation:fadeIn .25s ease-out;
+}
+.modal-img{
+    width:100%; max-width:270px;border-radius:12px;margin-bottom:22px;box-shadow:0 0 12px rgba(255,255,255,0.32);
+}
+.modal-buttons{width:100%; display:flex;justify-content:space-between;gap:12px;}
+.modal-btn{flex:1;border:none;border-radius:12px;padding:12px 0;font-size:17px;font-weight:700;cursor:pointer;}
+.cancel-btn{background:rgba(255,255,255,0.18);color:white;}
+.select-btn{background:#4a7fff;color:white;}
+
+@keyframes fadeIn{from { opacity:0; transform:scale(.92);} to { opacity:1; transform:scale(1);} }
+
+} /* END .page-select */
+
+
+/* ========== loading.html CSS ========== */
+
+.page-loading {
+
+/* 폰트 */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+/* 전체 화면 */
+body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Pretendard", sans-serif;
+}
+
+/* 오로라 그라데이션 */
+.aurora {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 25%,
+        rgba(0, 255, 255, 0.55),
+        rgba(0, 128, 255, 0.45),
+        rgba(255, 0, 255, 0.5),
+        transparent 70%
+    );
+    filter: blur(80px);
+    animation: auroraMove 18s ease-in-out infinite;
+    opacity: 0.85;
+}
+
+@keyframes auroraMove {
+    0% { transform: translate(-12%, -18%) scale(1.15) rotate(0deg); }
+    15% { transform: translate(10%, -5%) scale(1.25) rotate(40deg); }
+    30% { transform: translate(-8%, 15%) scale(1.22) rotate(120deg); }
+    50% { transform: translate(14%, -10%) scale(1.32) rotate(200deg); }
+    70% { transform: translate(-5%, 25%) scale(1.28) rotate(260deg); }
+    85% { transform: translate(8%, -12%) scale(1.20) rotate(320deg); }
+    100% { transform: translate(-12%, -18%) scale(1.15) rotate(360deg); }
+}
+
+/* 텍스트 */
+.loading-text {
+    position: relative;
+    z-index: 10;
+    color: #222;
+    font-size: 32px;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+.loading-text::after {
+    content: '';
+    display: inline-block;
+    width: 1.2em;
+    text-align: left;
+    animation: loadingDots 1.4s infinite steps(4);
+}
+
+@keyframes loadingDots {
+    0% { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+    100% { content: '...'; }
+}
+
+} /* END .page-loading */
+
+
+/* ========== result.html CSS ========== */
+
+.page-result {
+
+/* 폰트 */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+/* 기본 및 바디 */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #f9f9f9;
+    font-family: "Pretendard", sans-serif;
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* 오로라 */
+.aurora {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(circle at 50% 25%,
+        rgba(150, 255, 230, 0.45),
+        rgba(120, 180, 255, 0.4),
+        rgba(200, 160, 255, 0.45),
+        transparent 70%
+    );
+    filter: blur(80px);
+    animation: auroraMove 18s ease-in-out infinite;
+    opacity: 0.5;
+}
+
+@keyframes auroraMove {
+    0% { transform: translate(-12%, -18%) scale(1.15) rotate(0deg); }
+    15% { transform: translate(10%, -5%) scale(1.25) rotate(40deg); }
+    30% { transform: translate(-8%, 15%) scale(1.22) rotate(120deg); }
+    50% { transform: translate(14%, -10%) scale(1.32) rotate(200deg); }
+    70% { transform: translate(-5%, 25%) scale(1.28) rotate(260deg); }
+    85% { transform: translate(8%, -12%) scale(1.20) rotate(320deg); }
+    100% { transform: translate(-12%, -18%) scale(1.15) rotate(360deg); }
+}
+
+/* 내용 래퍼 */
+.content-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 5vh 5vw 0 5vw;
+}
+
+/* 사진 박스 */
+.photo-frame {
+    height: 72vh;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.07);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 플레이스홀더 */
+.placeholder-text {
+    font-size: 24px;
+    font-weight: 300;
+    color: #ccc;
+}
+
+/* 버튼 영역 */
+.button-container {
+    height: 23vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+}
+
+/* 버튼 공통 */
+.btn {
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    min-width: 160px;
+    text-align: center;
+    border-radius: 14px;
+    font-family: "Pretendard", sans-serif;
+}
+
+.btn-retry {
+    background: transparent;
+    border: 1.5px solid rgba(0, 0, 0, 0.25);
+    color: #333;
+}
+.btn-retry:hover { background: rgba(0, 0, 0, 0.05); }
+
+.btn-exit {
+    background: #222;
+    color: #ffffff;
+    border: 1.5px solid #222;
+}
+.btn-exit:hover {
+    background: #444;
+    border-color: #444;
+}
+
+} /* END .page-result */

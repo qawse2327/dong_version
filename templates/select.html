@@ -4,45 +4,13 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Select Clothes — Updated Layout</title>
-<style>
-:root {--ease: cubic-bezier(.2,.9,.3,1);--glass-bg: rgba(255,255,255,0.08);--glass-border: rgba(255,255,255,0.25);--glass-shadow:0 0 12px rgba(255,255,255,0.25),0 0 24px rgba(255,255,255,0.18),inset 0 0 6px rgba(255,255,255,0.25);}
-* { box-sizing: border-box; }
-body{margin:0;padding:0;width:100vw;height:100vh;display:flex;flex-direction:column;background:#000;overflow:hidden;font-family:"Noto Sans",sans-serif;color:white;}
-.tryon-btn{position:absolute;top:70%;transform:translateY(-110%);right:14px;padding:10px 26px;font-size:18px;font-weight:700;border-radius:40px;border:1px solid rgba(255,255,255,0.45);background:rgba(255,255,255,0.10);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:white;cursor:pointer;box-shadow:0 0 18px rgba(255,255,255,0.45),0 0 32px rgba(255,255,255,0.22),inset 0 0 8px rgba(255,255,255,0.25);transition:transform .18s ease, box-shadow .25s ease;}
-.tryon-btn:active{transform:translateY(-110%) scale(.95);box-shadow:0 0 24px rgba(255,255,255,0.65),0 0 44px rgba(255,255,255,0.32),inset 0 0 12px rgba(255,255,255,0.32);}
 
-.top-photo-area{height:70%;background:#000;background-size:cover;background-position:center;background-repeat:no-repeat;display:flex;justify-content:center;align-items:center;border-bottom:1px solid rgba(255,255,255,0.10);box-shadow:0 0 35px rgba(255,255,255,0.35),0 0 70px rgba(255,255,255,0.18),0 0 120px rgba(255,255,255,0.12);}
+<!-- fitting.css 연결 -->
+<link rel="stylesheet" href="/static/css/fitting.css">
 
-.clothes-row{height:15%;background:rgba(255,255,255,0.03);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,0.45);border-bottom:1px solid rgba(255,255,255,0.30);box-shadow:0 -2px 10px rgba(255,255,255,0.20),0 -4px 18px rgba(255,255,255,0.12),inset 0 1px 6px rgba(255,255,255,0.15);display:flex;align-items:center;padding:0 12px;}
-
-.row-title{width:70px;min-width:70px;font-size:18px;font-weight:700;color:rgba(255,255,255,0.88);text-shadow:0 0 6px rgba(255,255,255,0.35);}
-
-.horizontal-scroll{flex:1;display:flex;justify-content:center;flex-wrap:nowrap;align-items:center;overflow-x:auto;overflow-y:hidden;padding:10px 10px;scroll-behavior: smooth;mask-image: linear-gradient(to right,transparent 0%,black 12%,black 88%,transparent 100%);}
-.horizontal-scroll::-webkit-scrollbar{ height:6px }
-.horizontal-scroll::-webkit-scrollbar-track{background:rgba(255,255,255,0.08);border-radius:10px;}
-.horizontal-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.35);border-radius:10px;}
-
-.clothes-img{height:95%;max-height:150px;margin-right:20px;cursor:pointer;border-radius:12px;background:rgba(255,255,255,0.05);padding:4px;transition: transform .25s var(--ease), box-shadow .25s var(--ease),opacity .25s var(--ease);box-shadow:0 0 8px rgba(255,255,255,0.25),inset 0 0 10px rgba(255,255,255,0.15);}
-.clothes-img:hover{transform:scale(1.08);box-shadow:0 0 16px rgba(255,255,255,0.45),inset 0 0 16px rgba(255,255,255,0.25);}
-.clothes-img.selected{transform:scale(1.12);box-shadow:0 0 20px rgba(74,127,255,0.75),0 0 30px rgba(74,127,255,0.45),inset 0 0 16px rgba(74,127,255,0.30);outline:2px solid rgba(74,127,255,0.45);}
-.clothes-img.deal-from-center{position:relative;opacity:0;z-index:10;transition:transform 800ms var(--ease), opacity 400ms linear;}
-.clothes-img.dealt{transform:translate(0,0) rotate(0deg) scale(1);opacity:1;z-index:1;}
-
-@keyframes pop {0% { transform:scale(1);} 50% { transform:scale(1.12);} 100% { transform:scale(1.08);} }
-
-.modal-overlay{position:fixed; inset:0;background:rgba(0,0,0,0.6);display:flex; justify-content:center; align-items:center;z-index:3000;backdrop-filter:blur(4px);}
-.modal-box{background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.35);border-radius:16px;padding:22px;width:85%; max-width:380px;box-shadow:0 0 18px rgba(255,255,255,0.25),inset 0 0 10px rgba(255,255,255,0.25);animation:fadeIn .25s ease-out;}
-.modal-img{width:100%; max-width:270px;border-radius:12px;margin-bottom:22px;box-shadow:0 0 12px rgba(255,255,255,0.32);}
-.modal-buttons{width:100%; display:flex;justify-content:space-between;gap:12px;}
-.modal-btn{flex:1;border:none;border-radius:12px;padding:12px 0;font-size:17px;font-weight:700;cursor:pointer;}
-.cancel-btn{background:rgba(255,255,255,0.18);color:white;}
-.select-btn{background:#4a7fff;color:white;}
-
-@keyframes fadeIn{from { opacity:0; transform:scale(.92);} to { opacity:1; transform:scale(1);} }
-</style>
 </head>
 
-<body>
+<body class="page-select">
 
 <button class="tryon-btn" id="tryonBtn">착용하기</button>
 
@@ -66,177 +34,8 @@ body{margin:0;padding:0;width:100vw;height:100vh;display:flex;flex-direction:col
     </div>
 </div>
 
-
-<script>
-/* 🔥 페이지 들어올 때마다 완전 초기화 */
-localStorage.removeItem("tryonData");
-
-document.addEventListener("DOMContentLoaded", () => {
-    const savedImage = localStorage.getItem("capturedImage");
-
-    if (savedImage) {
-        document.querySelector(".top-photo-area").style.backgroundImage = `url('${savedImage}')`;
-    } else {
-        alert("사진이 없습니다. 다시 촬영해주세요.");
-        window.location.href = "/capture";
-        return;
-    }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    const imgs = [...document.querySelectorAll('.clothes-img')];
-    const scrollAreas = document.querySelectorAll('.horizontal-scroll');
-
-    function centerScrollArea(area) {
-        area.scrollLeft = (area.scrollWidth - area.clientWidth) / 2;
-    }
-
-    scrollAreas.forEach(area => {
-        setTimeout(() => centerScrollArea(area), 50);
-    });
-
-    window.addEventListener('resize', () => {
-        scrollAreas.forEach(area => centerScrollArea(area));
-    });
-
-    function computeBottomCenter(){
-        return {
-            x: window.innerWidth / 2,
-            y: window.innerHeight + 200
-        };
-    }
-    function px(v){ return `${v}px`; }
-
-    function prepareDeal(){
-        const C = computeBottomCenter();
-
-        imgs.forEach(img=>{
-            const r = img.getBoundingClientRect();
-            const dx = C.x - (r.left + r.width/2);
-            const dy = C.y - (r.top + r.height/2);
-            const rot = Math.random()*40 - 20;
-
-            img.style.transform = `translate(${px(dx)},${px(dy)}) rotate(${rot}deg) scale(.92)`;
-            img.style.opacity = 0;
-
-            img.classList.add('deal-from-center');
-            img.classList.remove('dealt');
-        });
-    }
-
-    function runDeal(){
-        imgs.forEach((img,i)=>{
-            const delay = i*80 + (Math.random()*60 - 30);
-            setTimeout(()=>{
-                img.style.transition = 'transform 700ms var(--ease), opacity 300ms linear';
-                img.style.transform = '';
-                img.style.opacity = 1;
-                setTimeout(()=> img.classList.add('dealt'), 10);
-            }, delay);
-        });
-    }
-
-    function startDeal(){
-        prepareDeal();
-        requestAnimationFrame(runDeal);
-    }
-
-    /* 모달 */
-    let isModalOpen = false;
-    let currentModal = null;
-
-    function openModal(img, type, name){
-        if (isModalOpen && currentModal) {
-            currentModal.remove();
-            isModalOpen = false;
-        }
-
-        const overlay = document.createElement('div');
-        overlay.className = 'modal-overlay';
-        currentModal = overlay;
-        isModalOpen = true;
-
-        overlay.innerHTML = `
-            <div class="modal-box">
-                <img src="${img.src}" class="modal-img">
-                <div class="modal-buttons">
-                    <button class="modal-btn cancel-btn">취소</button>
-                    <button class="modal-btn select-btn">선택</button>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(overlay);
-
-        overlay.querySelector('.cancel-btn').onclick = () => {
-            overlay.remove();
-            isModalOpen = false;
-            currentModal = null;
-        };
-        
-        overlay.querySelector('.select-btn').onclick = () => {
-            imgs.filter(x=> x.dataset.type === type)
-                .forEach(el=> el.classList.remove('selected'));
-            img.classList.add('selected');
-            
-            overlay.remove();
-            isModalOpen = false;
-            currentModal = null;
-        };
-    }
-
-    imgs.forEach(img=>{
-        img.addEventListener('click', ()=>{
-            img.style.animation = 'pop .32s var(--ease) forwards';
-            setTimeout(()=> img.style.animation='', 350);
-
-            openModal(img, img.dataset.type, img.dataset.name);
-        });
-    });
-
-    startDeal();
-});
-
-/* 🔥 TRY-ON 버튼 */
-document.addEventListener('DOMContentLoaded', () => {
-    const tryonBtn = document.getElementById('tryonBtn');
-    
-    tryonBtn.addEventListener('click', async () => {
-        const selectedTop = document.querySelector('.clothes-img[data-type="top"].selected');
-        const selectedBottom = document.querySelector('.clothes-img[data-type="bottom"].selected');
-        
-        if (!selectedTop && !selectedBottom) {
-            alert("상의 또는 하의를 선택해주세요.");
-            return;
-        }
-
-        function clean(src) {
-            if (!src) return null;
-            const idx = src.indexOf("/static/");
-            return idx !== -1 ? src.substring(idx) : src;
-        }
-
-        const topSrc = clean(selectedTop?.getAttribute('src'));
-        const bottomSrc = clean(selectedBottom?.getAttribute('src'));
-
-        let mode = "top";
-        if (topSrc && bottomSrc) mode = "both";
-        else if (bottomSrc) mode = "bottom";
-
-        tryonBtn.disabled = true;
-        tryonBtn.textContent = "처리 중...";
-
-        /* 🔥🔥 tryonData 저장 — loading.html이 찾는 핵심 */
-        const payload = { top: topSrc, bottom: bottomSrc, mode };
-        localStorage.setItem("tryonData", JSON.stringify(payload));
-
-        const loadingUrl =
-          `/loading?top=${encodeURIComponent(topSrc || '')}&bottom=${encodeURIComponent(bottomSrc || '')}&mode=${mode}`;
-
-        window.location.href = loadingUrl;
-    });
-});
-</script>
+<!-- fitting.js 연결 -->
+<script src="/static/js/fitting.js"></script>
 
 </body>
 </html>

@@ -5,177 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Aurora Loading</title>
 
-<style>
-    /* 폰트 (선택 사항) */
-    @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
-
-    /* 전체 화면 */
-    body {
-        margin: 0;
-        width: 100vw;
-        height: 100vh;
-        overflow: hidden;
-        background: #f9f9f9; /* ⬇⬇ #000에서 변경 ⬇⬇ */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: "Pretendard", sans-serif;
-    }
-
-    /* 오로라 그라데이션 레이어 */
-    .aurora {
-        position: absolute;
-        inset: 0;
-
-        background: radial-gradient(circle at 50% 25%,
-            rgba(0, 255, 255, 0.55),
-            rgba(0, 128, 255, 0.45),
-            rgba(255, 0, 255, 0.5),
-            transparent 70%
-        );
-
-        filter: blur(80px);
-        animation: auroraMove 18s ease-in-out infinite;
-        opacity: 0.85;
-    }
-
-    /* 오로라 애니메이션 (수정 없음) */
-    @keyframes auroraMove {
-        0% {
-            transform: translate(-12%, -18%) scale(1.15) rotate(0deg);
-        }
-        15% {
-            transform: translate(10%, -5%) scale(1.25) rotate(40deg);
-        }
-        30% {
-            transform: translate(-8%, 15%) scale(1.22) rotate(120deg);
-        }
-        50% {
-            transform: translate(14%, -10%) scale(1.32) rotate(200deg);
-        }
-        70% {
-            transform: translate(-5%, 25%) scale(1.28) rotate(260deg);
-        }
-        85% {
-            transform: translate(8%, -12%) scale(1.20) rotate(320deg);
-        }
-        100% {
-            transform: translate(-12%, -18%) scale(1.15) rotate(360deg);
-        }
-    }
-
-    /* 텍스트 */
-    .loading-text {
-        position: relative;
-        z-index: 10;
-        color: #222; /* ⬇⬇ white에서 변경 (텍스트가 보이도록) ⬇⬇ */
-        font-size: 32px;
-        font-weight: 300;
-        letter-spacing: 1px;
-    }
-
-    /* ⬇⬇ 'Loading...' 점 애니메이션 추가 ⬇⬇ */
-    .loading-text::after {
-        content: '';
-        /* 점 3개가 들어갈 공간을 미리 확보하여 텍스트가 튀는 것을 방지 */
-        display: inline-block;
-        width: 1.2em; 
-        text-align: left;
-        /* 4단계(없음, 점1, 점2, 점3)로 1.4초간 반복 */
-        animation: loadingDots 1.4s infinite steps(4); 
-    }
-
-    @keyframes loadingDots {
-        0% {
-            content: '';
-        }
-        25% {
-            content: '.';
-        }
-        50% {
-            content: '..';
-        }
-        75% {
-            content: '...';
-        }
-        100% { 
-            content: '...';
-        }
-    }
-    /* ⬆⬆ 여기까지 수정됨 ⬆⬆ */
-</style>
+<!-- fitting.css 연결 -->
+<link rel="stylesheet" href="/static/css/fitting.css">
 
 </head>
-<body>
+<body class="page-loading">
 
     <div class="aurora"></div>
     
     <div class="loading-text">Loading</div>
 
-<script>
-(async function() {
-  try {
-    // localStorage에서 선택된 옷 정보 가져오기
-    const tryonDataStr = localStorage.getItem('tryonData');
-    if (!tryonDataStr) {
-      alert('옷 선택 정보가 없습니다.');
-      window.location.href = '/select';
-      return;
-    }
-
-    const tryonData = JSON.parse(tryonDataStr);
-    
-    // 사용자 이미지 업로드
-    const capturedImage = localStorage.getItem('capturedImage');
-    if (capturedImage) {
-      await fetch('/upload', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ image: capturedImage })
-      });
-    }
-
-    // 옷 경로를 서버 경로 형식으로 변환
-    const topPath = tryonData.top ? tryonData.top.replace('/static/', 'static/') : null;
-    const bottomPath = tryonData.bottom ? tryonData.bottom.replace('/static/', 'static/') : null;
-
-    // Try-on API 호출
-    const response = await fetch('/tryon', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        top: topPath,
-        bottom: bottomPath,
-        mode: tryonData.mode
-      })
-    });
-
-    const result = await response.json();
-    
-    if (result.error) {
-      alert('오류: ' + result.error);
-      window.location.href = '/select';
-      return;
-    }
-
-    if (result.result) {
-      // 결과 페이지로 이동
-      window.location.href = `/result?image=${encodeURIComponent(result.result)}`;
-    } else {
-      alert('결과를 생성할 수 없습니다.');
-      window.location.href = '/select';
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('오류가 발생했습니다: ' + error.message);
-    window.location.href = '/select';
-  }
-})();
-</script>
+<!-- fitting.js 연결 -->
+<script src="/static/js/fitting.js"></script>
 
 </body>
 </html>
